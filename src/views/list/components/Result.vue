@@ -14,17 +14,18 @@
             <div class="flexbetween">
                 <div class="detectionContain">
                     <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
-                        <div :key="index" v-for="(item, index) in imgListCurr.fullResult">
-                            <template v-if="item['bbox&score'] && item['bbox&score'].length != 0">
-                                <div v-for="(itemScore, indexScore) in item['bbox&score']" :key="indexScore" :style="getStyle(itemScore, indexScore)">
-                                    <!-- <div>{{item.class_name}}</div> -->
-                                </div>
-                            </template>
-                        </div>
+                    <div :key="index" v-for="(item, index) in imgListCurr.fullResult">
+                        <template v-if="item['bbox&score'] && item['bbox&score'].length != 0">
+                            <div v-for="(itemScore, indexScore) in item['bbox&score']" :key="indexScore" :style="getStyle(itemScore, index)" class="scoreItem" @click="choosePoint(itemScore, item.class_name)">
+                                <!-- <div>{{item.class_name}}</div> -->
+                            </div>
+                        </template>
+                    </div>
                 </div>
                 <div class="detectionDetail">
-                    <div>已识别缺陷：</div>
-                    <div>折痕</div>
+                    <div>图片尺寸：{{imagSize}}</div>
+                    <div>已识别缺陷：{{chooseData.itemScore}}</div>
+                    <div>缺陷类型：{{chooseData.class_name}}</div>
                 </div>
             </div>
         </div>
@@ -36,6 +37,12 @@
     </div>
 </template>
 <script>
+const colorList = [
+    'red',
+    'green',
+    'white',
+    'gray'
+]
 export default {
     components: {},
     data() {
@@ -44,6 +51,8 @@ export default {
             imgList: [],
             imgListCurr: {},
             zoom: 1,
+            chooseData: {},
+            imagSize: ''
         };
     },
     created() {
@@ -63,24 +72,47 @@ export default {
                 if (res.data && res.data.code == 1) {
                     that.name = res.data.data.name
                     that.imgList = res.data.data.imgList
-                    that.imgListCurr = that.imgList[0]
-                    that.imgListCurr.fullResult = JSON.parse(that.imgListCurr.fullResult)
-                    // 获取比例
-                    that.zoom = await that.getProportion(that.imgListCurr.imgPathUrl)
+                    // 默认选中第一个
+                    that.setImg(0)
                 } else {
                     that.$message.error(res.data.msg)
                 }
             })
         },
-        getStyle (scoreList) {
-            // console.log(scoreList)
+        async setImg (index) {
+            this.imgListCurr = this.imgList[index]
+            this.imgListCurr.fullResult = JSON.parse(this.imgListCurr.fullResult)
+            // 获取比例
+            this.zoom = await this.getProportion(this.imgListCurr.imgPathUrl)
+        },
+        getStyle (itemScore, index) {
+            var left = (itemScore[0] / this.zoom).toFixed(0)
+            var top = (itemScore[1] / this.zoom).toFixed(0)
+            var width = (this.getLength(itemScore[0],itemScore[1],itemScore[2],itemScore[3]) / this.zoom).toFixed(0)
+            var height = (this.getLength(itemScore[2],itemScore[3],itemScore[4],itemScore[5]) / this.zoom).toFixed(0)
+            // 计算旋转角度的方法，待完善
+            var angel = this.getBevel(itemScore[3] - itemScore[1], itemScore[2] - itemScore[0]) || 0
+            // console.log(`left: ${left}px;top: ${top}px;width: ${width}px;height: ${height}px;background: ${colorList[index]};transform: rotate(${angel}deg);`)
+            return `left: ${left}px;top: ${top}px;width: ${width}px;height: ${height}px;background: ${colorList[index]};transform: rotate(${angel}deg);`
+        },
+        getLength (x, y, x1, y1) {
+            const a = (x - x1) > 0 ? (x - x1) : (x - x1) * -1
+            const b = (y - y1) > 0 ? (y - y1) : (y - y1) * -1
+            return Math.sqrt(a*a + b*b)
+        },
+        getBevel (width, height) {
+            const sin = width / height
+            const angle = Math.round((Math.asin(sin) * 180 / Math.PI))
+            return angle
         },
         async getProportion(imgPathUrl) {
+            var that = this
             return new Promise((resolve, reject) => {
                 try {
                     let image = new Image();
                     image.onload = function () {
                         // resolve({width: this.width, height: this.height});
+                        that.imagSize = `width: ${this.width}; height: ${this.height};`
                         resolve(this.width / 750)
                         this.removeAttribute('src');
                         image = null;
@@ -95,6 +127,12 @@ export default {
                     reject(error);
                 }
             });
+        },
+        choosePoint(itemScore, class_name) {
+            this.chooseData = {
+                itemScore,
+                class_name
+            }
         }
     },
     mounted() { },
@@ -118,10 +156,15 @@ export default {
         .bgImg {
             width: 100%;
         }
+
+        .scoreItem {
+            position: absolute;
+        }
     }
 
     .detectionDetail {
         margin-left: 80px;
+        width: 400px;
     }
 }
 </style>
