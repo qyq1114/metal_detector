@@ -31,7 +31,7 @@
                     <template slot-scope="scope">
                       <el-button
                         size="mini"
-                        @click="handleRoute('result')">查看</el-button>
+                        @click="handleRoute(`result?id=${scope.row.id}`)">查看</el-button>
                       <el-button
                         size="mini"
                         type="danger"
