@@ -1,0 +1,62 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+#app {
+    font-family: "Microsoft Yahei", "Avenir", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.topPart {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .left {
+        width: 55%;
+
+        .title {
+            font-size: 60px;
+            line-height: 93px;
+            margin-bottom: 24px;
+            overflow-wrap: break-word;
+            color: #215ef4;
+        }
+
+        .content {
+            font-size: 18px;
+            line-height: 35px;
+            margin-bottom: 48px;
+            overflow-wrap: break-word;
+            color: #868686;
+        }
+
+    }
+
+    .right {
+        background-image: url("./assets/images/top_banner.png");
+        height: 400px;
+        width: 40%;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: 50%;
+    }
+    .right1{
+        background-image: url("./assets/images/logo1.jpg");
+    }
+}
+.subTitle{
+    color:#333;
+    margin-bottom: 20px;
+}
+.el-descriptions__title{
+    font-size: 28px;
+    color:#333;
+}
