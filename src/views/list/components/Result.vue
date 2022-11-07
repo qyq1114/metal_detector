@@ -12,20 +12,15 @@
                 <el-descriptions-item label="烧蚀">苏州市</el-descriptions-item>
             </el-descriptions>
             <div class="flexbetween">
-                <div class="detectionContain">
+                <div class="detectionContain" id="detectionContain">
                     <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
-                    <canvas id="myCanvas" :width="canvas.width" :height="canvas.height"></canvas>
-                    <!-- <div :key="index" v-for="(item, index) in imgListCurr.fullResult">
-                        <template v-if="item['bbox&score'] && item['bbox&score'].length != 0">
-                            <div v-for="(itemScore, indexScore) in item['bbox&score']" :key="indexScore" :style="getStyle(itemScore, index)" class="scoreItem" @click="choosePoint(itemScore, item.class_name)">
-                            </div>
-                        </template>
-                    </div> -->
+                    <canvas id="myCanvas" :width="canvas.width" :height="canvas.height" @click="canvasClick"></canvas>
                 </div>
                 <div class="detectionDetail">
                     <div>图片尺寸：{{canvas}}</div>
                     <div>已识别缺陷：{{chooseData.itemScore}}</div>
                     <div>缺陷类型：{{chooseData.class_name}}</div>
+                    <div>点击位置：{{chooseData.position}}</div>
                 </div>
             </div>
         </div>
@@ -61,10 +56,19 @@ export default {
         this.getData()
     },
     mounted() {
-        var c = document.getElementById("myCanvas");
-        this.ctx = c.getContext("2d");
+        var c = document.getElementById("myCanvas")
+        this.ctx = c.getContext("2d")
     },  
     methods: {
+        canvasClick (e) {
+            var c = document.getElementById("detectionContain")
+            var x = e.clientX - c.offsetLeft
+            var y = e.clientY - c.offsetTop
+            console.log('position:' + e.clientX + '+++++' + e.clientY)
+            console.log('position:' + c.offsetLeft + '+++++' + c.offsetTop)
+            console.log('position:' + x + '+++++' + y)
+            this.setImg(this.imgIndex, {x, y})
+        },  
         getData () {
             var that = this
             this.$http({
@@ -92,13 +96,13 @@ export default {
             this.imgIndex = this.imgIndex + index
             this.setImg(this.imgIndex)
         },
-        async setImg (index) {
+        async setImg (index, position) {
             this.imgListCurr = this.imgList[index]
             // 获取比例
             await this.getProportion(this.imgListCurr.imgPathUrl)
             // 画布重新渲染后再绘制点
             this.$nextTick(()=> {
-                this.setScores(this.imgListCurr.fullResult)
+                this.setScores(this.imgListCurr.fullResult, position)
             })
         },
         async getProportion(imgPathUrl) {
@@ -128,19 +132,19 @@ export default {
                 }
             });
         },
-        setScores (list) {
+        setScores (list, position) {
             var that = this
             // 清空画布
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
             list.map((item, index) => {
                 if (item['bbox&score'] && item['bbox&score'].length != 0) {
                     item['bbox&score'].map((itemScore) => [
-                        that.draw(itemScore,  colorList[index])
+                        that.draw(itemScore,  colorList[index], item['class_name'], position)
                     ])
                 }
             })
         },
-        draw (scores, color) {
+        draw (scores, color, class_name, position) {
             const scoreZoom = []
             scores.map((item) => {
                 scoreZoom.push(item / this.zoom).toFixed(2)
@@ -153,6 +157,15 @@ export default {
             ctx.lineTo(scoreZoom[4],scoreZoom[5])
             ctx.lineTo(scoreZoom[6],scoreZoom[7])
             ctx.closePath()
+            if (position && this.ctx.isPointInPath(position.x, position.y)) {
+                this.chooseData = {
+                    itemScore: scoreZoom,
+                    class_name,
+                    position: {
+                        ...position
+                    }
+                }
+            }
             ctx.stroke()
         },
     },
@@ -178,6 +191,7 @@ export default {
         }
 
         #myCanvas {
+            cursor: pointer;
             position: absolute;
             left: 0;
             top: 0;
