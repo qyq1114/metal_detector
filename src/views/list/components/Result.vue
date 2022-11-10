@@ -12,26 +12,21 @@
                 <el-descriptions-item label="烧蚀">苏州市</el-descriptions-item>
             </el-descriptions>
             <div class="flexbetween">
-                <div class="detectionContain">
+                <div class="detectionContain" id="detectionContain">
                     <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
-                    <div :key="index" v-for="(item, index) in imgListCurr.fullResult">
-                        <template v-if="item['bbox&score'] && item['bbox&score'].length != 0">
-                            <div v-for="(itemScore, indexScore) in item['bbox&score']" :key="indexScore" :style="getStyle(itemScore, index)" class="scoreItem" @click="choosePoint(itemScore, item.class_name)">
-                                <!-- <div>{{item.class_name}}</div> -->
-                            </div>
-                        </template>
-                    </div>
+                    <canvas id="myCanvas" :width="canvas.width" :height="canvas.height" @click="canvasClick"></canvas>
                 </div>
                 <div class="detectionDetail">
-                    <div>图片尺寸：{{imagSize}}</div>
+                    <div>图片尺寸：{{canvas}}</div>
                     <div>已识别缺陷：{{chooseData.itemScore}}</div>
                     <div>缺陷类型：{{chooseData.class_name}}</div>
+                    <div>点击位置：{{chooseData.position}}</div>
                 </div>
             </div>
         </div>
         <div style="text-align:center">
-            <el-button icon="el-icon-arrow-left" style="margin-right:20px">上一张</el-button>
-            <el-button>下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+            <el-button icon="el-icon-arrow-left" style="margin-right:20px" @click="changeImg(-1)" v-if="imgIndex != 0">上一张</el-button>
+            <el-button @click="changeImg(1)" v-if="imgIndex != imgList.length -1">下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
         </div>
 
     </div>
@@ -47,18 +42,33 @@ export default {
     components: {},
     data() {
         return {
+            ctx: {},
+            canvas: {},
             name: '',
             imgList: [],
             imgListCurr: {},
+            imgIndex: 0,
             zoom: 1,
             chooseData: {},
-            imagSize: ''
         };
     },
     created() {
         this.getData()
     },
+    mounted() {
+        var c = document.getElementById("myCanvas")
+        this.ctx = c.getContext("2d")
+    },  
     methods: {
+        canvasClick (e) {
+            var c = document.getElementById("detectionContain")
+            var x = e.clientX - c.offsetLeft
+            var y = e.clientY - c.offsetTop
+            console.log('position:' + e.clientX + '+++++' + e.clientY)
+            console.log('position:' + c.offsetLeft + '+++++' + c.offsetTop)
+            console.log('position:' + x + '+++++' + y)
+            this.setImg(this.imgIndex, {x, y})
+        },  
         getData () {
             var that = this
             this.$http({
@@ -72,38 +82,28 @@ export default {
                 if (res.data && res.data.code == 1) {
                     that.name = res.data.data.name
                     that.imgList = res.data.data.imgList
+                    that.imgList.map((item) => {
+                        item.fullResult = JSON.parse(item.fullResult)
+                    })
                     // 默认选中第一个
-                    that.setImg(0)
+                    that.setImg(that.imgIndex)
                 } else {
                     that.$message.error(res.data.msg)
                 }
             })
         },
-        async setImg (index) {
+        changeImg (index) {
+            this.imgIndex = this.imgIndex + index
+            this.setImg(this.imgIndex)
+        },
+        async setImg (index, position) {
             this.imgListCurr = this.imgList[index]
-            this.imgListCurr.fullResult = JSON.parse(this.imgListCurr.fullResult)
             // 获取比例
-            this.zoom = await this.getProportion(this.imgListCurr.imgPathUrl)
-        },
-        getStyle (itemScore, index) {
-            var left = (itemScore[0] / this.zoom).toFixed(0)
-            var top = (itemScore[1] / this.zoom).toFixed(0)
-            var width = (this.getLength(itemScore[0],itemScore[1],itemScore[2],itemScore[3]) / this.zoom).toFixed(0)
-            var height = (this.getLength(itemScore[2],itemScore[3],itemScore[4],itemScore[5]) / this.zoom).toFixed(0)
-            // 计算旋转角度的方法，待完善
-            var angel = this.getBevel(itemScore[3] - itemScore[1], itemScore[2] - itemScore[0]) || 0
-            // console.log(`left: ${left}px;top: ${top}px;width: ${width}px;height: ${height}px;background: ${colorList[index]};transform: rotate(${angel}deg);`)
-            return `left: ${left}px;top: ${top}px;width: ${width}px;height: ${height}px;background: ${colorList[index]};transform: rotate(${angel}deg);`
-        },
-        getLength (x, y, x1, y1) {
-            const a = (x - x1) > 0 ? (x - x1) : (x - x1) * -1
-            const b = (y - y1) > 0 ? (y - y1) : (y - y1) * -1
-            return Math.sqrt(a*a + b*b)
-        },
-        getBevel (width, height) {
-            const sin = width / height
-            const angle = Math.round((Math.asin(sin) * 180 / Math.PI))
-            return angle
+            await this.getProportion(this.imgListCurr.imgPathUrl)
+            // 画布重新渲染后再绘制点
+            this.$nextTick(()=> {
+                this.setScores(this.imgListCurr.fullResult, position)
+            })
         },
         async getProportion(imgPathUrl) {
             var that = this
@@ -112,8 +112,12 @@ export default {
                     let image = new Image();
                     image.onload = function () {
                         // resolve({width: this.width, height: this.height});
-                        that.imagSize = `width: ${this.width}; height: ${this.height};`
-                        resolve(this.width / 750)
+                        that.zoom = this.width / 750
+                        that.canvas = {
+                            width: this.width / that.zoom,
+                            height: this.height / that.zoom
+                        }
+                        resolve()
                         this.removeAttribute('src');
                         image = null;
                     };
@@ -128,14 +132,43 @@ export default {
                 }
             });
         },
-        choosePoint(itemScore, class_name) {
-            this.chooseData = {
-                itemScore,
-                class_name
+        setScores (list, position) {
+            var that = this
+            // 清空画布
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+            list.map((item, index) => {
+                if (item['bbox&score'] && item['bbox&score'].length != 0) {
+                    item['bbox&score'].map((itemScore) => [
+                        that.draw(itemScore,  colorList[index], item['class_name'], position)
+                    ])
+                }
+            })
+        },
+        draw (scores, color, class_name, position) {
+            const scoreZoom = []
+            scores.map((item) => {
+                scoreZoom.push(item / this.zoom).toFixed(2)
+            })
+            const ctx = this.ctx
+            ctx.strokeStyle = color
+            ctx.beginPath()
+            ctx.moveTo(scoreZoom[0],scoreZoom[1])
+            ctx.lineTo(scoreZoom[2],scoreZoom[3])
+            ctx.lineTo(scoreZoom[4],scoreZoom[5])
+            ctx.lineTo(scoreZoom[6],scoreZoom[7])
+            ctx.closePath()
+            if (position && this.ctx.isPointInPath(position.x, position.y)) {
+                this.chooseData = {
+                    itemScore: scoreZoom,
+                    class_name,
+                    position: {
+                        ...position
+                    }
+                }
             }
-        }
+            ctx.stroke()
+        },
     },
-    mounted() { },
 };
 </script>
 
@@ -157,8 +190,11 @@ export default {
             width: 100%;
         }
 
-        .scoreItem {
+        #myCanvas {
+            cursor: pointer;
             position: absolute;
+            left: 0;
+            top: 0;
         }
     }
 
