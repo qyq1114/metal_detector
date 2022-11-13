@@ -49,7 +49,7 @@ export default {
 <style lang="scss">
 .el-header {
     width: 100%;
-    box-shadow: 0 0 5px #215ef4;
+    box-shadow: 0 0 5px #b6cbff;
 
     >div {
         width: 1344px;
@@ -64,6 +64,7 @@ export default {
         display: flex;
         align-content: center;
         align-items: center;
+
         .logo {
             padding: 10px;
             display: flex;
@@ -104,9 +105,13 @@ export default {
 
 .el-container {
     .el-main {
-        padding:40px 0;
-        width: 1344px;
-        margin: 0 auto;
+        padding: 5px 0 0 0;
+
+        .widFix {
+            padding-top: 40px;
+            width: 1344px;
+            margin: 0 auto;
+        }
     }
 }
 </style>

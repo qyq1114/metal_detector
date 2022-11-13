@@ -1,5 +1,5 @@
 <template>
-    <div class="result">
+    <div class="result widFix">
         <div>
             <div class="el-descriptions__title subTitle">新建任务</div>
             <el-form ref="form" :model="form" label-width="100px">

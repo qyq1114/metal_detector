@@ -1,63 +1,49 @@
 <template>
-  <div class="result"
-    v-loading="loading"
-    element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading"
-  >
-    <div>
-      <el-descriptions class="margin-top" title="检测结果" :column="4">
-        <template slot="extra">
-          <el-button type="primary" @click="exportData">导出</el-button>
-        </template>
-        <el-descriptions-item :span="4" label="任务名称">{{
-          detailData.name
-        }}</el-descriptions-item>
-        <el-descriptions-item label="折痕">{{
-          detailData.sumOfCreases
-        }}</el-descriptions-item>
-        <el-descriptions-item label="划痕">{{
-          detailData.sumOfScratches
-        }}</el-descriptions-item>
-        <el-descriptions-item label="凸凹点">{{
-          detailData.sumOfBumpPoints
-        }}</el-descriptions-item>
-        <el-descriptions-item label="烧蚀">{{
-          detailData.sumOfAblation
-        }}</el-descriptions-item>
-      </el-descriptions>
-      <div 
-        class="flexbetween" 
-      >
-        <div class="detectionContain" id="detectionContain">
-          <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
-          <canvas
-            id="myCanvas"
-            :width="canvas.width"
-            :height="canvas.height"
-            @click="canvasClick"
-          ></canvas>
-        </div>
-        <div class="detectionDetail">
-          <div>图片尺寸：{{ canvas }}</div>
-          <div>已识别缺陷：{{ chooseData.itemScore }}</div>
-          <div>缺陷类型：{{ chooseData.class_name }}</div>
-          <div>点击位置：{{ chooseData.position }}</div>
+  <div class="result" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading">
+    <div class="widFix">
+      <div>
+        <el-descriptions class="margin-top" title="检测结果" :column="4">
+          <template slot="extra">
+            <el-button type="primary" @click="exportData">导出</el-button>
+          </template>
+          <el-descriptions-item :span="4" label="任务名称">{{
+              detailData.name
+          }}</el-descriptions-item>
+          <el-descriptions-item label="折痕">{{
+              detailData.sumOfCreases
+          }}</el-descriptions-item>
+          <el-descriptions-item label="划痕">{{
+              detailData.sumOfScratches
+          }}</el-descriptions-item>
+          <el-descriptions-item label="凸凹点">{{
+              detailData.sumOfBumpPoints
+          }}</el-descriptions-item>
+          <el-descriptions-item label="烧蚀">{{
+              detailData.sumOfAblation
+          }}</el-descriptions-item>
+        </el-descriptions>
+        <div class="flexbetween">
+          <div class="detectionContain" id="detectionContain">
+            <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
+            <canvas id="myCanvas" :width="canvas.width" :height="canvas.height" @click="canvasClick"></canvas>
+          </div>
+          <div class="detectionDetail">
+            <div>图片尺寸：{{ canvas }}</div>
+            <div>已识别缺陷：{{ chooseData.itemScore }}</div>
+            <div>缺陷类型：{{ chooseData.class_name }}</div>
+            <div>点击位置：{{ chooseData.position }}</div>
+          </div>
         </div>
       </div>
+      <div style="text-align: center">
+        <el-button icon="el-icon-arrow-left" style="margin-right: 20px" @click="changeImg(-1)" v-if="imgIndex != 0">上一张
+        </el-button>
+        <el-button @click="changeImg(1)" v-if="imgIndex != imgList.length - 1">下一张<i
+            class="el-icon-arrow-right el-icon--right"></i></el-button>
+      </div>
     </div>
-    <div style="text-align: center">
-      <el-button
-        icon="el-icon-arrow-left"
-        style="margin-right: 20px"
-        @click="changeImg(-1)"
-        v-if="imgIndex != 0"
-        >上一张</el-button
-      >
-      <el-button @click="changeImg(1)" v-if="imgIndex != imgList.length - 1"
-        >下一张<i class="el-icon-arrow-right el-icon--right"></i
-      ></el-button>
-    </div>
-  </div>
+</div>
+
 </template>
 <script>
 const colorList = ["red", "green", "white", "gray"];
@@ -240,9 +226,10 @@ export default {
 
 <style lang="scss" scoped>
 .result {
-  > div {
+  >div {
     margin-bottom: 30px;
   }
+
   .flexbetween {
     display: flex;
     margin-bottom: 30px;
