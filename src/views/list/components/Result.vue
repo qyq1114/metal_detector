@@ -1,5 +1,9 @@
 <template>
-  <div class="result">
+  <div class="result"
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+  >
     <div>
       <el-descriptions class="margin-top" title="检测结果" :column="4">
         <template slot="extra">
@@ -21,7 +25,9 @@
           detailData.sumOfAblation
         }}</el-descriptions-item>
       </el-descriptions>
-      <div class="flexbetween">
+      <div 
+        class="flexbetween" 
+      >
         <div class="detectionContain" id="detectionContain">
           <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
           <canvas
@@ -66,6 +72,7 @@ export default {
       imgIndex: 0,
       zoom: 1,
       chooseData: {},
+      loading: true,
       detailData: {
         name: "",
         sumOfCreases: 0,
@@ -148,6 +155,9 @@ export default {
       this.setImg(this.imgIndex);
     },
     async setImg(index, position) {
+      this.loading = true
+      // 清空画布
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.imgListCurr = this.imgList[index];
       // 获取比例
       await this.getProportion(this.imgListCurr.imgPathUrl);
@@ -185,8 +195,6 @@ export default {
     },
     setScores(list, position) {
       var that = this;
-      // 清空画布
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       list.map((item, index) => {
         if (item["bbox&score"] && item["bbox&score"].length != 0) {
           item["bbox&score"].map((itemScore) => [
@@ -199,6 +207,7 @@ export default {
           ]);
         }
       });
+      that.loading = false
     },
     draw(scores, color, class_name, position) {
       const scoreZoom = [];
@@ -207,6 +216,7 @@ export default {
       });
       const ctx = this.ctx;
       ctx.strokeStyle = color;
+      ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(scoreZoom[0], scoreZoom[1]);
       ctx.lineTo(scoreZoom[2], scoreZoom[3]);
