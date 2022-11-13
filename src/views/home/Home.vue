@@ -223,9 +223,13 @@ export default {
 }
 .amap-info-content {
   background-color: #8b8b8b;
-  opacity: 0.8;
-  font-weight: bold;
+  opacity: 0.9;
   color: #fff;
+  padding:35px;
+}
+.amap-info-close{
+  top: 15px;
+  right: 15px;
 }
 .windows-text {
   .title {
@@ -235,7 +239,7 @@ export default {
     font-size: 18px;
   }
   p {
-    margin: 10px 0;
+    margin-bottom: 10px;
     span {
       width: 80px;
       display: inline-block;
