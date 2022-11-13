@@ -6,7 +6,7 @@ let kejianrouter = new Router({
   routes: [{
     path: '/',
     name: 'layout',
-    redirect:'/home',
+    redirect:'/login',
     component: () => import('./components/Layout.vue'),
     children: [{
       path: '/home',
@@ -32,7 +32,7 @@ let kejianrouter = new Router({
   {
     path: '/login',
     name: 'login',
-    component: () => import('./views/Login.vue')
+    component: () => import('./views/login/Login.vue')
   },
   ]
 })

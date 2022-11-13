@@ -2,8 +2,7 @@
   <div class="login">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>
-          金属表面缺陷检测系统</span>
+        <span> 金属表面缺陷检测系统</span>
       </div>
       <div>
         <el-form
@@ -14,10 +13,16 @@
           label-width="80px"
         >
           <el-form-item label="用户名" prop="name">
-            <el-input name="name" v-model="loginform.name"></el-input>
+            <el-input name="name" v-model="loginform.name" placeholder="admin"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="pass">
-            <el-input name="password" type="password" v-model="loginform.pass" autocomplete="off"></el-input>
+            <el-input
+              name="password"
+              type="password"
+              v-model="loginform.pass"
+              autocomplete="off"
+              placeholder="123456"
+            ></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="login">登录</el-button>
@@ -32,69 +37,67 @@
 </template>
 
 <script>
+import users from "./users.json";
 export default {
   data() {
     return {
       labelPosition: "right",
       loginform: {
         name: "",
-        pass: ""
+        pass: "",
       },
       rules: {
         name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
         pass: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          {
-            min: 5,
-            max: 20,
-            message: "密码长度在 5 到 20 个字符",
-            trigger: "blur"
-          }
-        ]
-      }
+          // {
+          //   min: 5,
+          //   max: 20,
+          //   message: "密码长度在 5 到 20 个字符",
+          //   trigger: "blur"
+          // }
+        ],
+      },
     };
   },
   methods: {
     login() {
-      this.$refs.lform.validate(valid => {
+      this.$refs.lform.validate((valid) => {
         if (valid) {
-          // this.$router.push('/');
-          this.$http
-            .get(
-              `User/Login?strUser=${this.loginform.name}&strPwd=${this.loginform.pass}`
-            )
-            .then(response => {
-              window.console.log(response);
-              if (response.data.bRes) {
-                this.$message({
-                  message: "登录成功了呢",
-                  type: "success"
-                });
-                sessionStorage.setItem("token", response.data.Ticket);
-                this.$router.push({ name: "admin" });
-              } else {
-                this.$message({
-                  message: "账号或密码错误",
-                  type: "error"
-                });
-              }
-            })
-            .catch(e => {
+          const user = users.find(
+            (item) =>
+              item.name == this.loginform.name &&
+              item.pass === this.loginform.pass
+          );
+          if (user) {
+            if (user.pass === this.loginform.pass) {
               this.$message({
-                message: "网络或程序异常！" + e,
-                type: "error"
+                message: "登录成功",
+                type: "success",
               });
+              this.$router.push("/home");
+            } else {
+              this.$message({
+                message: "账号或密码错误",
+                type: "error",
+              });
+            }
+          } else {
+            this.$message({
+              message: "账号或密码错误",
+              type: "error",
             });
+          }
         } else {
           this.$message({
             message: "请输入合法的值",
-            type: "error"
+            type: "error",
           });
           return false;
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

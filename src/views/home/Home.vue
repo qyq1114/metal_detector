@@ -27,10 +27,38 @@
         </el-col>
       </el-row>
     </div>
+    <div>
+      <el-row>
+        <el-amap
+          :plugin="plugin"
+          :center="center"
+          :zoom="zoom"
+          class="amap-demo"
+          style="width: 100%; height: 775px"
+        >
+          <el-amap-marker
+            v-for="marker in markers"
+            :position="marker.position"
+            :key="marker.id"
+            :events="marker.events"
+          >
+          </el-amap-marker>
+          <el-amap-info-window
+            v-if="window"
+            :position="window.position"
+            :visible="window.visible"
+            :content="window.content"
+            :offset="window.offset"
+          >
+          </el-amap-info-window>
+        </el-amap>
+      </el-row>
+    </div>
   </div>
 </template>
 <script>
 import * as echarts from "echarts";
+import markerData from "./markers.json";
 export default {
   components: {},
   data() {
@@ -41,10 +69,28 @@ export default {
         frequencyOfBumpPoints: "凸凹点",
         frequencyOfAblation: "烧蚀",
       },
+      zoom: 12,
+      center: [117.266758, 33.673426],
+      // 数据储存
+      pointMarker: markerData,
+      markers: [],
+      windows: [],
+      window: "",
+      plugin: [
+        {
+          pName: "ToolBar",
+          events: {
+            init(_instance) {
+              // console.log(instance)
+            },
+          },
+        },
+      ],
     };
   },
   mounted() {
     this.getStatistic();
+    this.point();
   },
   methods: {
     renderStatistic(label, data) {
@@ -60,7 +106,7 @@ export default {
           axisPointer: {
             type: "shadow",
           },
-          valueFormatter:(value) =>  `${value}%`
+          valueFormatter: (value) => `${value}%`,
         },
         xAxis: {
           type: "category",
@@ -102,14 +148,99 @@ export default {
           });
         });
     },
+    point() {
+      let markers = [];
+      let windows = [];
+      let that = this;
+      this.pointMarker.forEach((item, index) => {
+        markers.push({
+          position: [item.lng, item.lat],
+          icon: item.icon,
+          events: {
+            click() {
+              that.windows.forEach((window) => {
+                window.visible = false;
+              });
+              that.window = that.windows[index];
+              that.$nextTick(() => {
+                that.window.visible = true;
+              });
+            },
+          },
+        });
+        windows.push({
+          position: [item.lng, item.lat],
+          content:
+            '<div class="windows-text">' +
+            '<div class="text-map">' +
+            "<p class='title'>" +
+            item.title +
+            "</p>" +
+            "<p class='address'>" +
+            item.address +
+            "</p>" +
+            "<p><span>面积：</span>" +
+            item.area +
+            "</p>" +
+            "<p><span>工程师：</span>" +
+            item.numbers +
+            "</p>" +
+            "<p><span>产业类型：</span>" +
+            item.type +
+            "</p>" +
+            "<p><span>生产产品：</span>" +
+            item.product +
+            "</p>" +
+            "<p><span>服务市场：</span>" +
+            item.market +
+            "</p>" +
+            "<p><span>产能：</span>" +
+            item.productivity +
+            "</p>" +
+            "<p><span>投产时间：</span>" +
+            item.time +
+            "</p>" +
+            "</div>" +
+            "</div>",
+          offset: [0, -35],
+          visible: false,
+        });
+      });
+      //  加窗体
+      this.markers = markers;
+      // 加弹窗
+      this.windows = windows;
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .home {
   > div {
     margin-bottom: 48px;
+  }
+}
+.amap-info-content {
+  background-color: #8b8b8b;
+  opacity: 0.8;
+  font-weight: bold;
+  color: #fff;
+}
+.windows-text {
+  .title {
+    font-size: 24px;
+  }
+  .address {
+    font-size: 18px;
+  }
+  p {
+    margin: 10px 0;
+    span {
+      width: 80px;
+      display: inline-block;
+      text-align: right;
+    }
   }
 }
 </style>

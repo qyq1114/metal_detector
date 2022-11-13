@@ -13,7 +13,7 @@
                         <el-menu-item index="/list">智能检测</el-menu-item>
                     </el-menu>
                 </div>
-                <div class="logout">
+                <div class="logout" @click="handleRoute('login')">
                     <img src='../assets/images/icn_logout.svg' />
                     <span>登出</span>
                 </div>
@@ -38,7 +38,10 @@ export default {
         handleSelect(key) {
             this.isShow = this.defaultActive != key;
             window.console.log(this.isShow);
-        }
+        },
+        handleRoute(data) {
+            this.$router.push(`/${data}`)
+        },
     }
 };
 </script>
@@ -88,6 +91,7 @@ export default {
     .logout {
         display: flex;
         align-items: center;
+        cursor: pointer;
 
         img {
             width: 30px;
