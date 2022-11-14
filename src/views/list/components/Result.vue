@@ -49,10 +49,20 @@
           </div>
         </div>
         <div class="detectionDetail">
-          <div>图片尺寸：{{ canvas }}</div>
+          <!-- <div class="title">已识别缺陷：</div>
+          <div>图片尺寸：{{ `${Math.round(canvas.width * zoom)}*${Math.round(canvas.height * zoom)}` }}</div>
           <div>已识别缺陷：{{ chooseData.itemScore }}</div>
           <div>缺陷类型：{{ chooseData.class_name }}</div>
-          <div>点击位置：{{ chooseData.position }}</div>
+          <div>点击位置：{{ chooseData.position }}</div> -->
+          <div class="title">已识别缺陷：</div>
+          <template>
+            <div v-for="(item, index) in imgListCurr.fullResult" :key="index">
+              <div v-for="(itemScore, indexScore) in item['bbox&score']" :key="indexScore" :class="getChoosed(itemScore)">
+                <span>{{item["class_name"]}}：{{`${index}-${indexScore}`}}</span>
+                <!-- <span>{{itemScore}}</span> -->
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -191,6 +201,7 @@ export default {
     },
     async setImg(index, position) {
       this.loading = true
+      this.chooseData = {}
       // 清空画布
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.imgListCurr = this.imgList[index];
@@ -259,9 +270,9 @@ export default {
       ctx.lineTo(scoreZoom[6], scoreZoom[7]);
       ctx.closePath();
       if (position && this.ctx.isPointInPath(position.x, position.y)) {
-        console.log('选中了' + scoreZoom)
+        console.log('选中了' + scores)
         this.chooseData = {
-          itemScore: scoreZoom,
+          scores,
           class_name,
           position: {
             ...position,
@@ -343,6 +354,12 @@ export default {
         }
       }
     },
+    getChoosed (scores) {
+      if (JSON.stringify(this.chooseData.scores) == JSON.stringify(scores)) {
+        return 'choosed'
+      }
+      return ''
+    }
   },
 };
 </script>
@@ -377,8 +394,21 @@ export default {
   }
 
   .detectionDetail {
-    margin-left: 80px;
+    margin-left: 40px;
     width: 400px;
+    font-size: 16px;
+    line-height: 28px;
+    flex: 1;
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .choosed {
+      font-weight: bold;
+    }
   }
 
   .dragContain {
