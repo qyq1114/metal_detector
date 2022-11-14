@@ -35,7 +35,7 @@
             :style="detectionContainStyle"
             @mousewheel="scaleCanvas"
           >
-            <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
+            <img :src="imgListCurr.imgPathUrl" class="bgImg"/>
             <canvas
               id="myCanvas"
               :width="canvas.width"
