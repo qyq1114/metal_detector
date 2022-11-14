@@ -308,7 +308,7 @@ export default {
     mousemove (e) {
       if (this.movingCnfig.moving) {
         const x = e.clientX - this.movingCnfig.x
-        const y = e.clientX - this.movingCnfig.y
+        const y = e.clientY - this.movingCnfig.y
         this.transformData.x = this.transformData.x + x
         this.transformData.y = this.transformData.y + y
         const n = this.transformData.scale - 1
