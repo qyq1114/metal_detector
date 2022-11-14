@@ -67,7 +67,7 @@ export default {
 <style lang="scss">
 .el-header {
     width: 100%;
-    box-shadow: 0 0 5px #b6cbff;
+    box-shadow: 0px 4px 4px rgba(33, 94, 243, 0.08);
 
     >div {
         width: 1344px;
