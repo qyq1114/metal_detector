@@ -1,10 +1,10 @@
 <template>
-  <div class="result"
+  <div
     v-loading="loading"
     element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading"
   >
-    <div>
+    <div class="result">
       <el-descriptions class="margin-top" title="检测结果" :column="4">
         <template slot="extra">
           <el-button type="primary" @click="exportData">导出</el-button>
@@ -28,7 +28,7 @@
       <div 
         class="flexbetween" 
       >
-        <div class="dragContain" :style="`height: ${canvas.height}px`">
+        <div class="dragContain" id="dragContain" :style="`height: ${canvas.height}px`">
           <div 
             class="detectionContain" 
             id="detectionContain"
@@ -100,11 +100,13 @@ export default {
         moving: false,
         x: 0,
         y: 0
-      }
+      },
+      movingTime: 0,
     };
   },
   created() {
     this.getData();
+    this.movingTime = new Date().getTime()
   },
   mounted() {
     var c = document.getElementById("myCanvas");
@@ -148,10 +150,17 @@ export default {
       });
     },
     canvasClick(e) {
-      var c = document.getElementById("detectionContain");
-      var x = e.clientX - c.offsetLeft;
-      var y = e.clientY - c.offsetTop;
-      this.setImg(this.imgIndex, { x, y });
+      if (new Date().getTime() -  this.movingTime > 500) {
+        var c = document.getElementById("dragContain");
+        var x = e.clientX - c.offsetLeft;
+        var y = e.clientY - c.offsetTop;
+        const n = this.transformData.scale
+        const w = this.canvas.width * (n - 1) / 2
+        const h = this.canvas.height * (n - 1) / 2
+        x = (x - this.transformData.x + w) / n
+        y = (y - this.transformData.y + h) / n
+        this.setImg(this.imgIndex, { x, y });
+      }
     },
     getData() {
       var that = this;
@@ -250,6 +259,7 @@ export default {
       ctx.lineTo(scoreZoom[6], scoreZoom[7]);
       ctx.closePath();
       if (position && this.ctx.isPointInPath(position.x, position.y)) {
+        console.log('选中了' + scoreZoom)
         this.chooseData = {
           itemScore: scoreZoom,
           class_name,
@@ -297,6 +307,7 @@ export default {
     },
     mouseup () {
       this.movingCnfig.moving = false
+      // console.log('停止拖拽')
     },
     mousedown (e) {
       this.movingCnfig = {
@@ -304,13 +315,19 @@ export default {
         x: e.clientX,
         y: e.clientY
       }
+      // console.log('开始拖拽')
     },
     mousemove (e) {
       if (this.movingCnfig.moving) {
         const x = e.clientX - this.movingCnfig.x
         const y = e.clientY - this.movingCnfig.y
+        if (x != 0 && y != 0) {
+          // x和y都发生偏移时，记作拖拽事件，阻塞点击事件0.5秒
+          this.movingTime = new Date().getTime()
+        }
         this.transformData.x = this.transformData.x + x
         this.transformData.y = this.transformData.y + y
+        // console.log('开始移动' + JSON.stringify(this.transformData))
         const n = this.transformData.scale - 1
         if (this.transformData.x > this.canvas.width * n / 2) {
           this.transformData.x = this.canvas.width * n / 2
@@ -332,9 +349,12 @@ export default {
 
 <style lang="scss" scoped>
 .result {
-  > div {
-    margin-bottom: 30px;
-  }
+  width: 1344px;
+  margin: 0 auto;
+  margin-top: 20px;
+  // > div {
+  //   margin-bottom: 30px;
+  // }
   .flexbetween {
     display: flex;
     margin-bottom: 30px;
