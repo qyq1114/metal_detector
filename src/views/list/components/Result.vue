@@ -203,7 +203,7 @@ export default {
       this.loading = true
       this.chooseData = {}
       // 清空画布
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.imgListCurr = this.imgList[index];
       // 获取比例
       await this.getProportion(this.imgListCurr.imgPathUrl);
