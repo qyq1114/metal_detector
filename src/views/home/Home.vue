@@ -79,18 +79,7 @@
         </el-amap>
       </div>
     </div>
-    <div class="footer">
-      <div class="footer-content">
-        <ul class="content-nav">
-          <li>
-            <p>联系方式</p>
-            <span>邮箱：xxx@163.com</span>
-            <span>电话：</span>
-            <span>地址：安徽省宿州市博望路58号</span>
-          </li>
-        </ul>
-      </div>
-    </div>
+    
   </div>
 </template>
 <script>
@@ -301,50 +290,5 @@ export default {
     }
   }
 }
-.footer {
-  width: 100%;
-  height: 216px;
-  overflow: hidden;
-  background-color: #ecf1fe;
-  margin-bottom: 0 !important;
-  &-content {
-    width: 1344px;
-    margin: 0 auto;
-    padding-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    .content-nav {
-      display: flex;
-      justify-content: space-around;
-      li {
-        display: flex;
-        flex-direction: column;
-        padding: 0 20px;
-        //justify-content: center;
-        align-items: flex-start;
-        p {
-          color: #215ef3;
-          font-family: "PingFang SC";
-          font-style: normal;
-          font-weight: 600;
-          font-size: 16px;
-          line-height: 22px;
-          margin-bottom: 30px;
-        }
-        span {
-          font-weight: 400;
-          font-size: 14px;
-          line-height: 20px;
-          color: #3e3e3e;
-          margin-bottom: 15px;
-        }
-      }
-    }
-    img {
-      width: 170px;
-      height: 170px;
-      padding: 10px;
-    }
-  }
-}
+
 </style>
