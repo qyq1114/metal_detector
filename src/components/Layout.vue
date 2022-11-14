@@ -103,6 +103,7 @@ export default {
 }
 
 .el-container {
+    min-height: 100%;
     .logo {
         display: flex;
         align-items: center;
@@ -125,6 +126,7 @@ export default {
     }
 
     .el-main {
+        min-height: calc(100% - 280px);
         padding: 5px 0 0 0;
         margin-bottom: 40px;
 
