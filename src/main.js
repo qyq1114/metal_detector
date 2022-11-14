@@ -4,8 +4,9 @@ import router from './router'
 import axios from 'axios'
 
 import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
+// import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
+import './style/theme/index.css'
 import './main.scss'
 import VueAMap from 'vue-amap'
 Vue.use(VueAMap)

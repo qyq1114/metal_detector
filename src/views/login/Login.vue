@@ -113,6 +113,10 @@ a {
   padding: 200px 0;
   width: 100%;
   height: 100%;
+  background-image: url("../../assets/images/bg2.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .text {

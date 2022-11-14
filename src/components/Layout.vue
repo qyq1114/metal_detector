@@ -30,7 +30,7 @@ export default {
     data() {
         return {
             router: true,
-            defaultActive: "/home",
+            defaultActive: this.$route.name==='home'?'/home':'/list',
             isShow: false
         };
     },

@@ -81,7 +81,7 @@
   </div>
 </template>
 <script>
-const colorList = ["red", "green", "white", "gray"];
+const colorList = ["#f0f00b", "#11ec11", "white", "red"];
 export default {
   components: {},
   data() {

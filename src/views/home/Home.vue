@@ -32,12 +32,10 @@
     <div class="whitePart subPart">
       <div class="wid40">
         <div class="title">自动化的提供</div>
-        <div class="content">
-          金属表面各类缺陷数据统计
-        </div>
+        <div class="content">金属表面各类缺陷数据统计</div>
       </div>
       <div class="wid60">
-        <div id="main" style="height: 450px;width:100%"></div>
+        <div id="main" style="height: 450px; width: 100%"></div>
       </div>
     </div>
     <div class="whitePart subPart">
@@ -55,15 +53,42 @@
         <div class="content">智慧工厂</div>
       </div>
       <div class="wid60">
-        <el-amap :plugin="plugin" :center="center" :zoom="zoom" class="amap-demo" mapStyle='amap://styles/dark'
-          style="width: 100%; height: 450px">
-          <el-amap-marker v-for="marker in markers" :position="marker.position" :key="marker.id"
-            :events="marker.events">
+        <el-amap
+          :plugin="plugin"
+          :center="center"
+          :zoom="zoom"
+          class="amap-demo"
+          mapStyle="amap://styles/dark"
+          style="width: 100%; height: 450px"
+        >
+          <el-amap-marker
+            v-for="marker in markers"
+            :position="marker.position"
+            :key="marker.id"
+            :events="marker.events"
+          >
           </el-amap-marker>
-          <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible"
-            :content="window.content" :offset="window.offset">
+          <el-amap-info-window
+            v-if="window"
+            :position="window.position"
+            :visible="window.visible"
+            :content="window.content"
+            :offset="window.offset"
+          >
           </el-amap-info-window>
         </el-amap>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-content">
+        <ul class="content-nav">
+          <li>
+            <p>联系方式</p>
+            <span>邮箱：xxx@163.com</span>
+            <span>电话：</span>
+            <span>地址：安徽省宿州市博望路58号</span>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
@@ -92,8 +117,7 @@ export default {
         {
           pName: "ToolBar",
           events: {
-            init() {
-            },
+            init() {},
           },
         },
       ],
@@ -108,7 +132,7 @@ export default {
       var myChart = echarts.init(document.getElementById("main"));
       // 绘制图表
       const option = {
-        barMaxWidth:60,
+        barMaxWidth: 60,
         grid: {
           right: 0,
         },
@@ -138,15 +162,15 @@ export default {
             data: data,
             type: "bar",
             label: {
-              position:'top',
+              position: "top",
               show: true,
-              formatter: '{b}'
+              formatter: "{b}",
             },
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#83bff6' },
-                { offset: 1, color: '#215ef4' }
-              ])
+                { offset: 0, color: "#83bff6" },
+                { offset: 1, color: "#215ef4" },
+              ]),
             },
           },
         ],
@@ -243,37 +267,83 @@ export default {
 
 <style lang="scss">
 .home {
-  >div {
+  > div {
     margin-bottom: 48px;
   }
 }
 
 .amap-info-content {
-  background-color: #8b8b8b;
-  opacity: 0.9;
+  background-color: #8b8b8bb3;
   color: #fff;
-  padding:35px;
+  padding: 35px;
 }
-.amap-info-close{
+.amap-info-close {
   top: 15px;
   right: 15px;
 }
 
 .windows-text {
   .title {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .address {
-    font-size: 18px;
+    font-size: 14px;
   }
 
   p {
+    font-size: 14px;
     margin-bottom: 10px;
     span {
       width: 80px;
       display: inline-block;
       text-align: right;
+    }
+  }
+}
+.footer {
+  width: 100%;
+  height: 216px;
+  overflow: hidden;
+  background-color: #ecf1fe;
+  margin-bottom: 0 !important;
+  &-content {
+    width: 1344px;
+    margin: 0 auto;
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    .content-nav {
+      display: flex;
+      justify-content: space-around;
+      li {
+        display: flex;
+        flex-direction: column;
+        padding: 0 20px;
+        //justify-content: center;
+        align-items: flex-start;
+        p {
+          color: #215ef3;
+          font-family: "PingFang SC";
+          font-style: normal;
+          font-weight: 600;
+          font-size: 16px;
+          line-height: 22px;
+          margin-bottom: 30px;
+        }
+        span {
+          font-weight: 400;
+          font-size: 14px;
+          line-height: 20px;
+          color: #3e3e3e;
+          margin-bottom: 15px;
+        }
+      }
+    }
+    img {
+      width: 170px;
+      height: 170px;
+      padding: 10px;
     }
   }
 }
