@@ -28,14 +28,25 @@
       <div 
         class="flexbetween" 
       >
-        <div class="detectionContain" id="detectionContain">
-          <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
-          <canvas
-            id="myCanvas"
-            :width="canvas.width"
-            :height="canvas.height"
-            @click="canvasClick"
-          ></canvas>
+        <div class="dragContain" :style="`height: ${canvas.height}px`">
+          <div 
+            class="detectionContain" 
+            id="detectionContain"
+            :style="detectionContainStyle"
+            @mousewheel="scaleCanvas"
+          >
+            <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
+            <canvas
+              id="myCanvas"
+              :width="canvas.width"
+              :height="canvas.height"
+              @click="canvasClick"
+              @mouseup="mouseup"
+              @mouseout="mouseup"
+              @mousedown="mousedown"
+              @mousemove="mousemove"
+            ></canvas>
+          </div>
         </div>
         <div class="detectionDetail">
           <div>图片尺寸：{{ canvas }}</div>
@@ -80,6 +91,16 @@ export default {
         sumOfBumpPoints: 0,
         sumOfAblation: 0,
       },
+      transformData: {
+        scale: 1,
+        x: 0,
+        y: 0,
+      },
+      movingCnfig: {
+        moving: false,
+        x: 0,
+        y: 0
+      }
     };
   },
   created() {
@@ -89,6 +110,14 @@ export default {
     var c = document.getElementById("myCanvas");
     this.ctx = c.getContext("2d");
   },
+  computed: {
+    detectionContainStyle() {
+      return `transform: scale(${this.transformData.scale});left: ${this.transformData.x}px; top: ${this.transformData.y}px`
+    },
+    positionStyle () {
+      return `left: ${this.transformData.x}px; top: ${this.transformData.y}px`
+    }
+  },  
   methods: {
     exportData() {
       this.$http({
@@ -122,9 +151,6 @@ export default {
       var c = document.getElementById("detectionContain");
       var x = e.clientX - c.offsetLeft;
       var y = e.clientY - c.offsetTop;
-      console.log("position:" + e.clientX + "+++++" + e.clientY);
-      console.log("position:" + c.offsetLeft + "+++++" + c.offsetTop);
-      console.log("position:" + x + "+++++" + y);
       this.setImg(this.imgIndex, { x, y });
     },
     getData() {
@@ -234,6 +260,72 @@ export default {
       }
       ctx.stroke();
     },
+    // 区域方法缩小
+    scaleCanvas (e) {
+      if(e.wheelDelta) {   
+          if(e.wheelDelta > 0) {     //当鼠标滚轮向上滚动时
+            // console.log("鼠标滚轮向上滚动");
+            this.setDetectionContain(e, -1)
+          }
+          if(e.wheelDelta < 0) {     //当鼠标滚轮向下滚动时
+            // console.log("鼠标滚轮向下滚动");
+            this.setDetectionContain(e, 1)
+          }
+        } else if(e.detail) {
+          if(e.detail < 0) {   //当鼠标滚轮向上滚动时
+            // console.log("鼠标滚轮向上滚动");
+            this.setDetectionContain(e, -1)
+          }
+          if(e.detail > 0) {   //当鼠标滚轮向下滚动时
+            // console.log("鼠标滚轮向下滚动");
+            this.setDetectionContain(e, 1)
+          }
+        }
+    },
+    setDetectionContain (e, index) {
+      e.preventDefault()
+      if (index > 0 && this.transformData.scale < 4) {
+        this.transformData.scale = (this.transformData.scale * 10 + 1) / 10
+      }
+      if (index < 0 && this.transformData.scale > 1) {
+        this.transformData.scale = (this.transformData.scale * 10 - 1) / 10
+        if (this.transformData.scale == 1) {
+          this.transformData.x = 0
+          this.transformData.y = 0
+        }
+      }
+    },
+    mouseup () {
+      this.movingCnfig.moving = false
+    },
+    mousedown (e) {
+      this.movingCnfig = {
+        moving: true,
+        x: e.clientX,
+        y: e.clientY
+      }
+    },
+    mousemove (e) {
+      if (this.movingCnfig.moving) {
+        const x = e.clientX - this.movingCnfig.x
+        const y = e.clientX - this.movingCnfig.y
+        this.transformData.x = this.transformData.x + x
+        this.transformData.y = this.transformData.y + y
+        const n = this.transformData.scale - 1
+        if (this.transformData.x > this.canvas.width * n / 2) {
+          this.transformData.x = this.canvas.width * n / 2
+        }
+        if (this.transformData.x < this.canvas.width * n / 2 * -1) {
+          this.transformData.x = this.canvas.width * n / 2 * -1
+        }
+        if (this.transformData.y > this.canvas.height * n / 2) {
+          this.transformData.y = this.canvas.height * n / 2
+        }
+        if (this.transformData.y < this.canvas.height * n / 2 * -1) {
+          this.transformData.y = this.canvas.height * n / 2 * -1
+        }
+      }
+    },
   },
 };
 </script>
@@ -250,7 +342,7 @@ export default {
 
   .detectionContain {
     width: 750px;
-    position: relative;
+    position: absolute;
 
     .bgImg {
       width: 100%;
@@ -267,6 +359,12 @@ export default {
   .detectionDetail {
     margin-left: 80px;
     width: 400px;
+  }
+
+  .dragContain {
+    width: 750px;
+    overflow: hidden;
+    position: relative;
   }
 }
 </style>
