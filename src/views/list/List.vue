@@ -92,7 +92,7 @@ export default {
       search: "",
       total: 0,
       currentPage: 1,
-      pageSize: "10",
+      pageSize: 10,
       tableData: [],
       loading: false,
       dialogVisible: false,
