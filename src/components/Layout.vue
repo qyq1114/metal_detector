@@ -15,7 +15,7 @@
                 </div>
                 <div class="logout" @click="handleRoute('login')">
                     <img src='../assets/images/icn_logout.svg' />
-                    <span>登出</span>
+                    <span style="font-size:14px">登出</span>
                 </div>
             </div>
         </el-header>
@@ -49,7 +49,7 @@ export default {
 <style lang="scss">
 .el-header {
     width: 100%;
-    box-shadow: 0 0 5px #215ef4;
+    box-shadow: 0 0 5px #b6cbff;
 
     >div {
         width: 1344px;
@@ -64,8 +64,8 @@ export default {
         display: flex;
         align-content: center;
         align-items: center;
+
         .logo {
-            padding: 10px;
             display: flex;
             align-items: center;
             margin-right: 200px;
@@ -78,8 +78,11 @@ export default {
             }
 
             span {
-                color: #215ef4;
-                font-weight: bold;
+                color: #215EF3;
+                font-family: 'Arial';
+                font-style: normal;
+                font-weight: 700;
+                font-size: 18px;
             }
         }
 
@@ -96,7 +99,7 @@ export default {
         img {
             width: 30px;
             height: 30px;
-            margin-right: 10px;
+            margin-right: 5px;
         }
     }
 
@@ -104,9 +107,13 @@ export default {
 
 .el-container {
     .el-main {
-        padding:40px 0;
-        width: 1344px;
-        margin: 0 auto;
+        padding: 5px 0 0 0;
+
+        .widFix {
+            padding-top: 40px;
+            width: 1344px;
+            margin: 0 auto;
+        }
     }
 }
 </style>

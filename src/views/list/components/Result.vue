@@ -1,6 +1,10 @@
 <template>
-  <div class="result">
-    <div>
+  <div
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+  >
+    <div class="result">
       <el-descriptions class="margin-top" title="检测结果" :column="4">
         <template slot="extra">
           <el-button type="primary" @click="exportData">导出</el-button>
@@ -21,21 +25,44 @@
           detailData.sumOfAblation
         }}</el-descriptions-item>
       </el-descriptions>
-      <div class="flexbetween">
-        <div class="detectionContain" id="detectionContain">
-          <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
-          <canvas
-            id="myCanvas"
-            :width="canvas.width"
-            :height="canvas.height"
-            @click="canvasClick"
-          ></canvas>
+      <div 
+        class="flexbetween" 
+      >
+        <div class="dragContain" id="dragContain" :style="`height: ${canvas.height}px`">
+          <div 
+            class="detectionContain" 
+            id="detectionContain"
+            :style="detectionContainStyle"
+            @mousewheel="scaleCanvas"
+          >
+            <el-image :src="imgListCurr.imgPathUrl" class="bgImg"></el-image>
+            <canvas
+              id="myCanvas"
+              :width="canvas.width"
+              :height="canvas.height"
+              @click="canvasClick"
+              @mouseup="mouseup"
+              @mouseout="mouseup"
+              @mousedown="mousedown"
+              @mousemove="mousemove"
+            ></canvas>
+          </div>
         </div>
         <div class="detectionDetail">
-          <div>图片尺寸：{{ canvas }}</div>
+          <!-- <div class="title">已识别缺陷：</div>
+          <div>图片尺寸：{{ `${Math.round(canvas.width * zoom)}*${Math.round(canvas.height * zoom)}` }}</div>
           <div>已识别缺陷：{{ chooseData.itemScore }}</div>
           <div>缺陷类型：{{ chooseData.class_name }}</div>
-          <div>点击位置：{{ chooseData.position }}</div>
+          <div>点击位置：{{ chooseData.position }}</div> -->
+          <div class="title">已识别缺陷：</div>
+          <template>
+            <div v-for="(item, index) in imgListCurr.fullResult" :key="index">
+              <div v-for="(itemScore, indexScore) in item['bbox&score']" :key="indexScore" :class="getChoosed(itemScore)">
+                <span>{{item["class_name"]}}：{{`${index}-${indexScore}`}}</span>
+                <!-- <span>{{itemScore}}</span> -->
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -66,6 +93,7 @@ export default {
       imgIndex: 0,
       zoom: 1,
       chooseData: {},
+      loading: true,
       detailData: {
         name: "",
         sumOfCreases: 0,
@@ -73,15 +101,35 @@ export default {
         sumOfBumpPoints: 0,
         sumOfAblation: 0,
       },
+      transformData: {
+        scale: 1,
+        x: 0,
+        y: 0,
+      },
+      movingCnfig: {
+        moving: false,
+        x: 0,
+        y: 0
+      },
+      movingTime: 0,
     };
   },
   created() {
     this.getData();
+    this.movingTime = new Date().getTime()
   },
   mounted() {
     var c = document.getElementById("myCanvas");
     this.ctx = c.getContext("2d");
   },
+  computed: {
+    detectionContainStyle() {
+      return `transform: scale(${this.transformData.scale});left: ${this.transformData.x}px; top: ${this.transformData.y}px`
+    },
+    positionStyle () {
+      return `left: ${this.transformData.x}px; top: ${this.transformData.y}px`
+    }
+  },  
   methods: {
     exportData() {
       this.$http({
@@ -112,13 +160,17 @@ export default {
       });
     },
     canvasClick(e) {
-      var c = document.getElementById("detectionContain");
-      var x = e.clientX - c.offsetLeft;
-      var y = e.clientY - c.offsetTop;
-      console.log("position:" + e.clientX + "+++++" + e.clientY);
-      console.log("position:" + c.offsetLeft + "+++++" + c.offsetTop);
-      console.log("position:" + x + "+++++" + y);
-      this.setImg(this.imgIndex, { x, y });
+      if (new Date().getTime() -  this.movingTime > 500) {
+        var c = document.getElementById("dragContain");
+        var x = e.clientX - c.offsetLeft;
+        var y = e.clientY - c.offsetTop;
+        const n = this.transformData.scale
+        const w = this.canvas.width * (n - 1) / 2
+        const h = this.canvas.height * (n - 1) / 2
+        x = (x - this.transformData.x + w) / n
+        y = (y - this.transformData.y + h) / n
+        this.setImg(this.imgIndex, { x, y });
+      }
     },
     getData() {
       var that = this;
@@ -148,6 +200,10 @@ export default {
       this.setImg(this.imgIndex);
     },
     async setImg(index, position) {
+      this.loading = true
+      this.chooseData = {}
+      // 清空画布
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.imgListCurr = this.imgList[index];
       // 获取比例
       await this.getProportion(this.imgListCurr.imgPathUrl);
@@ -185,8 +241,6 @@ export default {
     },
     setScores(list, position) {
       var that = this;
-      // 清空画布
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       list.map((item, index) => {
         if (item["bbox&score"] && item["bbox&score"].length != 0) {
           item["bbox&score"].map((itemScore) => [
@@ -199,6 +253,7 @@ export default {
           ]);
         }
       });
+      that.loading = false
     },
     draw(scores, color, class_name, position) {
       const scoreZoom = [];
@@ -207,6 +262,7 @@ export default {
       });
       const ctx = this.ctx;
       ctx.strokeStyle = color;
+      ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(scoreZoom[0], scoreZoom[1]);
       ctx.lineTo(scoreZoom[2], scoreZoom[3]);
@@ -214,8 +270,9 @@ export default {
       ctx.lineTo(scoreZoom[6], scoreZoom[7]);
       ctx.closePath();
       if (position && this.ctx.isPointInPath(position.x, position.y)) {
+        console.log('选中了' + scores)
         this.chooseData = {
-          itemScore: scoreZoom,
+          scores,
           class_name,
           position: {
             ...position,
@@ -224,15 +281,97 @@ export default {
       }
       ctx.stroke();
     },
+    // 区域方法缩小
+    scaleCanvas (e) {
+      if(e.wheelDelta) {   
+          if(e.wheelDelta > 0) {     //当鼠标滚轮向上滚动时
+            // console.log("鼠标滚轮向上滚动");
+            this.setDetectionContain(e, -1)
+          }
+          if(e.wheelDelta < 0) {     //当鼠标滚轮向下滚动时
+            // console.log("鼠标滚轮向下滚动");
+            this.setDetectionContain(e, 1)
+          }
+        } else if(e.detail) {
+          if(e.detail < 0) {   //当鼠标滚轮向上滚动时
+            // console.log("鼠标滚轮向上滚动");
+            this.setDetectionContain(e, -1)
+          }
+          if(e.detail > 0) {   //当鼠标滚轮向下滚动时
+            // console.log("鼠标滚轮向下滚动");
+            this.setDetectionContain(e, 1)
+          }
+        }
+    },
+    setDetectionContain (e, index) {
+      e.preventDefault()
+      if (index > 0 && this.transformData.scale < 4) {
+        this.transformData.scale = (this.transformData.scale * 10 + 1) / 10
+      }
+      if (index < 0 && this.transformData.scale > 1) {
+        this.transformData.scale = (this.transformData.scale * 10 - 1) / 10
+        if (this.transformData.scale == 1) {
+          this.transformData.x = 0
+          this.transformData.y = 0
+        }
+      }
+    },
+    mouseup () {
+      this.movingCnfig.moving = false
+      // console.log('停止拖拽')
+    },
+    mousedown (e) {
+      this.movingCnfig = {
+        moving: true,
+        x: e.clientX,
+        y: e.clientY
+      }
+      // console.log('开始拖拽')
+    },
+    mousemove (e) {
+      if (this.movingCnfig.moving) {
+        const x = e.clientX - this.movingCnfig.x
+        const y = e.clientY - this.movingCnfig.y
+        if (x != 0 && y != 0) {
+          // x和y都发生偏移时，记作拖拽事件，阻塞点击事件0.5秒
+          this.movingTime = new Date().getTime()
+        }
+        this.transformData.x = this.transformData.x + x
+        this.transformData.y = this.transformData.y + y
+        // console.log('开始移动' + JSON.stringify(this.transformData))
+        const n = this.transformData.scale - 1
+        if (this.transformData.x > this.canvas.width * n / 2) {
+          this.transformData.x = this.canvas.width * n / 2
+        }
+        if (this.transformData.x < this.canvas.width * n / 2 * -1) {
+          this.transformData.x = this.canvas.width * n / 2 * -1
+        }
+        if (this.transformData.y > this.canvas.height * n / 2) {
+          this.transformData.y = this.canvas.height * n / 2
+        }
+        if (this.transformData.y < this.canvas.height * n / 2 * -1) {
+          this.transformData.y = this.canvas.height * n / 2 * -1
+        }
+      }
+    },
+    getChoosed (scores) {
+      if (JSON.stringify(this.chooseData.scores) == JSON.stringify(scores)) {
+        return 'choosed'
+      }
+      return ''
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .result {
-  > div {
-    margin-bottom: 30px;
-  }
+  width: 1344px;
+  margin: 0 auto;
+  margin-top: 20px;
+  // > div {
+  //   margin-bottom: 30px;
+  // }
   .flexbetween {
     display: flex;
     margin-bottom: 30px;
@@ -240,7 +379,7 @@ export default {
 
   .detectionContain {
     width: 750px;
-    position: relative;
+    position: absolute;
 
     .bgImg {
       width: 100%;
@@ -255,8 +394,27 @@ export default {
   }
 
   .detectionDetail {
-    margin-left: 80px;
+    margin-left: 40px;
     width: 400px;
+    font-size: 16px;
+    line-height: 28px;
+    flex: 1;
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .choosed {
+      font-weight: bold;
+    }
+  }
+
+  .dragContain {
+    width: 750px;
+    overflow: hidden;
+    position: relative;
   }
 }
 </style>

@@ -1,58 +1,70 @@
 <template>
   <div class="home">
-    <!-- <div class="bgImg">
-            <div class="center">
-                <div class="title">智能检测</div>
-                <div class="content">
-                    依托于AI视觉检测技术，可在复杂的缺陷类型和环境干扰下大幅减少漏检误检，赋能生产过程产品的外观检测环节，解决了传统检测人力成本高、效率低、难追溯的难点和痛点
-                </div>
-            </div>
-        </div> -->
     <div class="topPart">
-      <div class="left">
-        <div class="title">智能检测</div>
-        <div class="content">
-          依托于AI视觉检测技术，可在复杂的缺陷类型和环境干扰下大幅减少漏检误检，赋能生产过程产品的外观检测环节，解决了传统检测人力成本高、效率低、难追溯的难点和痛点
+      <div class="wrapper">
+        <div class="wid60">
+          <div class="title">智能检测</div>
+          <div class="content">
+            依托于AI视觉检测技术，可在复杂的缺陷类型和环境干扰下大幅减少漏检误检，赋能生产过程产品的外观检测环节，解决了传统检测人力成本高、效率低、难追溯的难点和痛点
+          </div>
+        </div>
+        <div class="wid40">
+          <div class="images top"></div>
         </div>
       </div>
-      <div class="right"></div>
     </div>
-    <div>
-      <el-row>
-        <el-col :span="12"
-          ><video src="" width="100%" height="400" controls></video
-        ></el-col>
-        <el-col :span="12">
-          <div id="main" style="height: 400px"></div>
-        </el-col>
-      </el-row>
+    <div class="bgPart">
+      <div class="wrapper">
+        <div>
+          <div class="images img1"></div>
+          <div class="description">使用AI技术赋能制造工厂</div>
+        </div>
+        <div>
+          <div class="images img2"></div>
+          <div class="description">将生产过程数字化、智能化</div>
+        </div>
+        <div>
+          <div class="images img3"></div>
+          <div class="description">通过智慧系统将各类文档归集</div>
+        </div>
+      </div>
     </div>
-    <div>
-      <el-row>
-        <el-amap
-          :plugin="plugin"
-          :center="center"
-          :zoom="zoom"
-          class="amap-demo"
-          style="width: 100%; height: 775px"
-        >
-          <el-amap-marker
-            v-for="marker in markers"
-            :position="marker.position"
-            :key="marker.id"
-            :events="marker.events"
-          >
+    <div class="whitePart subPart">
+      <div class="wid40">
+        <div class="title">自动化的提供</div>
+        <div class="content">
+          金属表面各类缺陷数据统计
+        </div>
+      </div>
+      <div class="wid60">
+        <div id="main" style="height: 450px;width:100%"></div>
+      </div>
+    </div>
+    <div class="whitePart subPart">
+      <div class="wid60">
+        <video src="" width="100%" height="450" controls></video>
+      </div>
+      <div class="wid40">
+        <div class="title">记录生产过程</div>
+        <div class="content">未来利用ai技术分析改进</div>
+      </div>
+    </div>
+    <div class="whitePart subPart">
+      <div class="wid40">
+        <div class="title">服务于汽车后市场行业的</div>
+        <div class="content">智慧工厂</div>
+      </div>
+      <div class="wid60">
+        <el-amap :plugin="plugin" :center="center" :zoom="zoom" class="amap-demo" mapStyle='amap://styles/dark'
+          style="width: 100%; height: 450px">
+          <el-amap-marker v-for="marker in markers" :position="marker.position" :key="marker.id"
+            :events="marker.events">
           </el-amap-marker>
-          <el-amap-info-window
-            v-if="window"
-            :position="window.position"
-            :visible="window.visible"
-            :content="window.content"
-            :offset="window.offset"
-          >
+          <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible"
+            :content="window.content" :offset="window.offset">
           </el-amap-info-window>
         </el-amap>
-      </el-row>
+      </div>
     </div>
   </div>
 </template>
@@ -80,8 +92,7 @@ export default {
         {
           pName: "ToolBar",
           events: {
-            init(_instance) {
-              // console.log(instance)
+            init() {
             },
           },
         },
@@ -97,6 +108,10 @@ export default {
       var myChart = echarts.init(document.getElementById("main"));
       // 绘制图表
       const option = {
+        barMaxWidth:60,
+        grid: {
+          right: 0,
+        },
         title: {
           text: "缺陷统计",
           left: "center",
@@ -122,6 +137,17 @@ export default {
           {
             data: data,
             type: "bar",
+            label: {
+              position:'top',
+              show: true,
+              formatter: '{b}'
+            },
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#83bff6' },
+                { offset: 1, color: '#215ef4' }
+              ])
+            },
           },
         ],
       };
@@ -217,10 +243,11 @@ export default {
 
 <style lang="scss">
 .home {
-  > div {
+  >div {
     margin-bottom: 48px;
   }
 }
+
 .amap-info-content {
   background-color: #8b8b8b;
   opacity: 0.9;
@@ -231,13 +258,16 @@ export default {
   top: 15px;
   right: 15px;
 }
+
 .windows-text {
   .title {
     font-size: 24px;
   }
+
   .address {
     font-size: 18px;
   }
+
   p {
     margin-bottom: 10px;
     span {

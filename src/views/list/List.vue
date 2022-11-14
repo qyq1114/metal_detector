@@ -1,11 +1,11 @@
 <template>
-    <div class="list">
+    <div class="list widFix">
         <div class="topPart">
             <div class="left">
                 <div class="title">缺陷检测</div>
                 <div class="content">{{ content }}</div>
             </div>
-            <div class="right right1"></div>
+            <div class="right"></div>
         </div>
         <div>
             <div class="searchArea">

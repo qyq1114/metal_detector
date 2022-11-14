@@ -75,6 +75,7 @@ export default {
                 message: "登录成功",
                 type: "success",
               });
+              sessionStorage.setItem("token","0536D68E34548DAC419F4B36D2757473")
               this.$router.push("/home");
             } else {
               this.$message({
