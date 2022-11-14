@@ -11,21 +11,33 @@ let kejianrouter = new Router({
     children: [{
       path: '/home',
       name: 'home',
+      meta: {
+        requireAuth: true,
+      },
       component: () => import('./views/home/Home.vue')
     },
     {
       path: '/list',
       name: 'list',
+      meta: {
+        requireAuth: true,
+      },
       component: () => import('./views/list/List.vue'),
     },
     {
       path: '/result',
       name: 'result',
+      meta: {
+        requireAuth: true,
+      },
       component: () => import('./views/list/components/Result.vue'),
     },
     {
       path: '/addTask',
       name: 'addTask',
+      meta: {
+        requireAuth: true,
+      },
       component: () => import('./views/list/components/AddTask.vue'),
     }]
   },
@@ -43,7 +55,7 @@ kejianrouter.beforeEach((to, from, next) => {
   // 判断是否需要登录权限
   if (to.matched.some(res => res.meta.requireAuth)) {
     // 判断是否登录
-    if (sessionStorage.getItem('token')) {
+    if (localStorage.getItem('token')) {
       next()
     } else {
       // 没登录则跳转到登录界面

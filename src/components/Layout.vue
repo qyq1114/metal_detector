@@ -40,6 +40,7 @@ export default {
             window.console.log(this.isShow);
         },
         handleRoute(data) {
+            localStorage.setItem('token', '')
             this.$router.push(`/${data}`)
         },
     }
