@@ -1,10 +1,10 @@
 <template>
   <div class="login">
     <el-row>
-      <el-col :span="12">
+      <el-col :span="14">
         <div class="loginLeft"></div>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="10">
           <div class="loginWrapper">
             <h1 class="loginTitle">金属表面缺陷检测系统</h1>
             <el-form
