@@ -412,6 +412,7 @@ export default {
     .choosed {
       color:#215ef3;
       font-weight: bolder;
+      font-size: 19px;
     }
   }
 

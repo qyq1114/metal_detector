@@ -1,38 +1,41 @@
 <template>
   <div class="login">
-    <el-card class="box-card">
-      <div slot="header" class="clearfix">
-        <span>金属表面缺陷检测系统</span>
-      </div>
-      <div>
-        <el-form
-          class="demo-ruleForm"
-          ref="lform"
-          :model="loginform"
-          :rules="rules"
-          label-width="80px"
-        >
-          <el-form-item label="用户名" prop="name">
-            <el-input name="name" v-model="loginform.name" placeholder="admin"></el-input>
-          </el-form-item>
-          <el-form-item label="密码" prop="pass">
-            <el-input
-              name="password"
-              type="password"
-              v-model="loginform.pass"
-              autocomplete="off"
-              placeholder="123456"
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="login">登录</el-button>
-            <!-- <el-button type="text">
-              <router-link to="/">回到首页</router-link>
-            </el-button> -->
-          </el-form-item>
-        </el-form>
-      </div>
-    </el-card>
+    <el-row>
+      <el-col :span="12">
+        <div class="loginLeft"></div>
+      </el-col>
+      <el-col :span="12">
+          <div class="loginWrapper">
+            <h1 class="loginTitle">金属表面缺陷检测系统</h1>
+            <el-form
+              class="demo-ruleForm"
+              ref="lform"
+              :model="loginform"
+              :rules="rules"
+              label-width="0"
+            >
+              <el-form-item label="" prop="name">
+                <el-input name="name" v-model="loginform.name" placeholder="admin"></el-input>
+              </el-form-item>
+              <el-form-item label="" prop="pass">
+                <el-input
+                  name="password"
+                  type="password"
+                  v-model="loginform.pass"
+                  autocomplete="off"
+                  placeholder="123456"
+                ></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="login" style="width: 100%;">登录</el-button>
+                <!-- <el-button type="text">
+                  <router-link to="/">回到首页</router-link>
+                </el-button> -->
+              </el-form-item>
+            </el-form>
+          </div>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -110,37 +113,37 @@ a {
 
 .login {
   //display: flex;
-  padding: 200px 0;
+  //padding: 200px 0;
   width: 100%;
   height: 100%;
-  background-image: url("../../assets/images/bg2.jpg");
+  //background-image: url("../../assets/images/bg2.jpg");
+  //background-repeat: no-repeat;
+  //background-size: cover;
+  //background-position: center;
+  .el-row,.el-col,.el-card{
+    height: 100%;
+  }
+  .loginWrapper{
+    display: flex;
+    flex-direction: column;
+    margin: 150px 100px;
+    .loginTitle{
+      color:#215ef4;
+      margin-bottom: 80px;
+    }
+    .el-form-item{
+      margin-bottom: 45px;
+    }
+  }
+  
+}
+.loginLeft{
+  width: 100%;
+  height: 100%;
+  background-image: url("../../assets/images/login.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
 }
 
-.text {
-  font-size: 14px;
-}
-
-.item {
-  margin-bottom: 18px;
-}
-
-.clearfix:before,
-.clearfix:after {
-  display: table;
-  content: "";
-}
-.clearfix:after {
-  clear: both;
-}
-
-.box-card {
-  width: 480px;
-  margin: 0 auto;
-}
-.el-form-item__content {
-  text-align: start;
-}
 </style>
