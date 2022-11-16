@@ -2,7 +2,7 @@
   <div class="login">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span> 金属表面缺陷检测系统</span>
+        <span>金属表面缺陷检测系统</span>
       </div>
       <div>
         <el-form

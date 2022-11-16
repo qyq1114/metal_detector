@@ -31,7 +31,7 @@ Vue.use(VueLazyload, {
 Vue.config.productionTip = false
 
 //设置超时时间
-axios.defaults.timeout = 5000
+axios.defaults.timeout = 20000
 //设置api地址
 //全局定义axios
 axios.defaults.baseURL = '/detection'

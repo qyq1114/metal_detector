@@ -356,9 +356,9 @@ export default {
     },
     getChoosed (scores) {
       if (JSON.stringify(this.chooseData.scores) == JSON.stringify(scores)) {
-        return 'choosed'
+        return 'choosed resultItem'
       }
-      return ''
+      return 'resultItem'
     }
   },
 };
@@ -396,18 +396,22 @@ export default {
   .detectionDetail {
     margin-left: 40px;
     width: 400px;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 28px;
     flex: 1;
 
     .title {
       font-size: 24px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 30px;
     }
 
+    .resultItem{
+      margin-bottom: 10px;
+    }
     .choosed {
-      font-weight: bold;
+      color:#215ef3;
+      font-weight: bolder;
     }
   }
 
