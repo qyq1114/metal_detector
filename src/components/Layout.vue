@@ -76,7 +76,7 @@ export default {
   },
   watch:{
     $route: function(newRouter,oldRouter) {
-      this.defaultActive = newRouter.path === "home" ? "/home" : "/list"
+      this.defaultActive = newRouter.path === "/home" ? "/home" : "/list"
     }
   }
 };
