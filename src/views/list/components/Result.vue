@@ -162,8 +162,9 @@ export default {
     canvasClick(e) {
       if (new Date().getTime() -  this.movingTime > 500) {
         var c = document.getElementById("dragContain");
+        const app = document.getElementById("app")
         var x = e.clientX - c.offsetLeft;
-        var y = e.clientY - c.offsetTop;
+        var y = e.clientY - c.offsetTop + app.scrollTop;
         const n = this.transformData.scale
         const w = this.canvas.width * (n - 1) / 2
         const h = this.canvas.height * (n - 1) / 2
