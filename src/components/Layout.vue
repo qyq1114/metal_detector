@@ -11,7 +11,6 @@
             :default-active="defaultActive"
             class="el-menu-demo"
             mode="horizontal"
-            @select="handleSelect"
             :router="router"
           >
             <el-menu-item index="/home">智慧工厂</el-menu-item>
@@ -37,7 +36,7 @@
           <ul class="content-nav">
             <li>
               <p>网站导航</p>
-              <el-link @click="handleRoute('home')">智慧工厂</el-link>
+              <el-link @click="handleRoute('home')" >智慧工厂</el-link>
               <el-link @click="handleRoute('list')">智能检测</el-link>
             </li>
           </ul>
@@ -59,15 +58,10 @@ export default {
   data() {
     return {
       router: true,
-      defaultActive: this.$route.name === "home" ? "/home" : "/list",
-      isShow: false,
+      defaultActive: this.$route.name === "home" ? "/home" : "/list"
     };
   },
   methods: {
-    handleSelect(key) {
-      this.isShow = this.defaultActive != key;
-      window.console.log(this.isShow);
-    },
     logout() {
       localStorage.setItem("token", "");
       this.$router.push(`/login`);
@@ -80,6 +74,11 @@ export default {
       this.$router.push(`/${data}`);
     },
   },
+  watch:{
+    $route: function(newRouter,oldRouter) {
+      this.defaultActive = newRouter.path === "home" ? "/home" : "/list"
+    }
+  }
 };
 </script>
 

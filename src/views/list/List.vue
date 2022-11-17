@@ -26,10 +26,7 @@
             @click="getList(currentPage)"
           ></el-button>
         </el-input>
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          @click="handleRoute('addTask')"
+        <el-button type="primary" icon="el-icon-plus" @click="handleRoute('addTask')"
           >新建任务</el-button
         >
       </div>
@@ -67,10 +64,18 @@
         :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
         :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
+        layout="slot, total, sizes, prev, pager, next, jumper"
         :total="total"
         style="text-align: right; margin-top: 30px"
       >
+        <span>
+          <el-button
+            type="text"
+            icon="el-icon-refresh"
+            style="font-size:18px"
+            @click="getList(currentPage,pageSize)"
+          ></el-button>
+        </span>
       </el-pagination>
     </div>
     <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
@@ -115,7 +120,14 @@ export default {
       this.$router.push(`/${data}`);
     },
     rowClick(row) {
-      this.handleRoute(`result?id=${row.id}`);
+      if (row.finished) {
+        this.handleRoute(`result?id=${row.id}`);
+      } else {
+        this.$message({
+          message: "检测未成功，请稍后再试！",
+          type: "error",
+        });
+      }
     },
     getList(currentPage = this.currentPage, pageSize = this.pageSize) {
       this.loading = true;
@@ -178,20 +190,19 @@ export default {
     justify-content: space-between;
     margin-bottom: 20px;
   }
+  .el-button--text {
+    color: #606266;
+  }
+  .el-button--text:hover {
+    color: #215ef4;
+  }
   .el-table {
     thead th.el-table__cell {
       background: rgb(245, 247, 250);
     }
-    .el-button--text {
-      color: #606266;
-    }
-    .el-button--text:hover {
-      color: #215ef4;
-    }
+    
     .el-table--border .el-table__cell,
-    .el-table__body-wrapper
-      .el-table--border.is-scrolling-left
-      ~ .el-table__fixed {
+    .el-table__body-wrapper .el-table--border.is-scrolling-left ~ .el-table__fixed {
       border-right: 0;
     }
   }
