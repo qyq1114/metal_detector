@@ -14,16 +14,16 @@
               :rules="rules"
               label-width="0"
             >
-              <el-form-item label="" prop="name">
-                <el-input name="name" v-model="loginform.name" placeholder="admin"></el-input>
+              <el-form-item label="" prop="username">
+                <el-input name="username" v-model="loginform.username" placeholder="用户名"></el-input>
               </el-form-item>
               <el-form-item label="" prop="pass">
                 <el-input
                   name="password"
                   type="password"
-                  v-model="loginform.pass"
+                  v-model="loginform.password"
                   autocomplete="off"
-                  placeholder="123456"
+                  placeholder="密码"
                 ></el-input>
               </el-form-item>
               <el-form-item>
@@ -40,18 +40,18 @@
 </template>
 
 <script>
-import users from "./users.json";
+// import users from "./users.json";
 export default {
   data() {
     return {
       labelPosition: "right",
       loginform: {
-        name: "",
-        pass: "",
+        username: "",
+        password: "",
       },
       rules: {
-        name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-        pass: [
+        username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+        password: [
           { required: true, message: "请输入密码", trigger: "blur" },
           // {
           //   min: 5,
@@ -67,13 +67,12 @@ export default {
     login() {
       this.$refs.lform.validate((valid) => {
         if (valid) {
-          const user = users.find(
-            (item) =>
-              item.name == this.loginform.name &&
-              item.pass === this.loginform.pass
-          );
-          if (user) {
-            if (user.pass === this.loginform.pass) {
+          this.$http({
+            method: "post",
+            url: "/login",
+            data: this.loginform,
+          }).then(async (res) => {
+            if (res.data && res.data.code == 1) {
               this.$message({
                 message: "登录成功",
                 type: "success",
@@ -86,12 +85,32 @@ export default {
                 type: "error",
               });
             }
-          } else {
-            this.$message({
-              message: "账号或密码错误",
-              type: "error",
-            });
-          }
+          });
+          // const user = users.find(
+          //   (item) =>
+          //     item.name == this.loginform.name &&
+          //     item.pass === this.loginform.pass
+          // );
+          // if (user) {
+          //   if (user.pass === this.loginform.pass) {
+          //     this.$message({
+          //       message: "登录成功",
+          //       type: "success",
+          //     });
+          //     localStorage.setItem("token","0536D68E34548DAC419F4B36D2757473")
+          //     this.$router.push("/home");
+          //   } else {
+          //     this.$message({
+          //       message: "账号或密码错误",
+          //       type: "error",
+          //     });
+          //   }
+          // } else {
+          //   this.$message({
+          //     message: "账号或密码错误",
+          //     type: "error",
+          //   });
+          // }
         } else {
           this.$message({
             message: "请输入合法的值",
